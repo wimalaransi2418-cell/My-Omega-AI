@@ -65,11 +65,10 @@ def chat_engine():
         "memory_count": len(chat_memory)
     })
 
-if __name__ == '__main__':
-    print("🤖 Omega Brain Upgraded & Running...")
-
-    if __name__ == "__main__":
-    # Render එකට අවශ්‍ය පෝට් එක (Port) හඳුනා ගැනීම
+if __name__ == "__main__":
     import os
+    print("🧠 Omega Brain Upgraded & Running...")
+    # Render එකට අවශ්‍ය Port එක හඳුනා ගැනීම
     port = int(os.environ.get("PORT", 5000))
+    # අන්තර්ජාලයට දොරවල් විවෘත කිරීම (host='0.0.0.0')
     app.run(host='0.0.0.0', port=port)
