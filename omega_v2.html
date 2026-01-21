@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Omega: The Final AI</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #020202; color: #fff; margin: 0; overflow: hidden; display: flex; justify-content: center; height: 100vh; }
+        #neuralCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+
+        .chat-container {
+            position: relative; z-index: 1; width: 100%; max-width: 900px; height: 100%;
+            display: flex; flex-direction: column; background: rgba(10, 15, 20, 0.85);
+            border: 1px solid #333; backdrop-filter: blur(15px); transition: 0.5s;
+        }
+        
+        /* Thinking State Glow */
+        .state-thinking { border-color: #d400ff; box-shadow: 0 0 30px rgba(212, 0, 255, 0.3); }
+
+        .header { padding: 15px 25px; background: rgba(15, 15, 15, 0.95); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .brand { font-size: 1.6em; font-weight: bold; letter-spacing: 1px; }
+        .brand span { background: -webkit-linear-gradient(45deg, #00e5ff, #d400ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        #chat-history { flex: 1; overflow-y: auto; padding: 25px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+
+        .message { max-width: 80%; padding: 12px 20px; border-radius: 18px; font-size: 1em; line-height: 1.6; animation: popUp 0.3s ease; }
+        .user-msg { align-self: flex-end; background: #222; border: 1px solid #444; color: #eee; }
+        .ai-msg { align-self: flex-start; background: rgba(255,255,255,0.05); border-left: 3px solid #00e5ff; }
+        
+        .loader { color: #00e5ff; font-size: 0.8em; margin-bottom: 10px; display: none; }
+
+        .input-area { padding: 20px; background: #000; display: flex; gap: 15px; border-top: 1px solid #333; }
+        input { flex: 1; padding: 15px 25px; border-radius: 50px; border: 1px solid #333; background: #0a0a0a; color: #fff; outline: none; font-size: 1.1em; }
+        button { width: 55px; height: 55px; border-radius: 50%; border: none; background: linear-gradient(135deg, #00e5ff, #0088ff); cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.1); box-shadow: 0 0 15px #00e5ff; }
+
+        @keyframes popUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #333; }
+    </style>
+</head>
+<body>
+
+<canvas id="neuralCanvas"></canvas>
+
+<div class="chat-container" id="mainUI">
+    <div class="header">
+        <div class="brand">Gemini <span>Omega</span></div>
+        <div id="status" style="color: #00ff88; font-family: monospace; font-size: 0.8em;">BRAIN ONLINE 🧠</div>
+    </div>
+
+    <div id="chat-history">
+        <div class="message ai-msg">
+            <strong>💎 System Ready.</strong><br>
+            හායි යාලු! මම දැන් ලෑස්තියි. ඔයාට ඕනෑම ප්‍රශ්නයක් මගෙන් අහන්න පුළුවන්.
+        </div>
+    </div>
+
+    <div id="loadingIndicator" class="loader" style="padding-left: 25px;">⚡ මොළය සිතමින් පවතී...</div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask me anything...">
+        <button onclick="processOmega()">
+            <svg viewBox="0 0 24 24" width="24" height="24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="black"></path></svg>
+        </button>
+    </div>
+</div>
+
+<script>
+    // --- 1. NEURAL ANIMATION ---
+    const canvas = document.getElementById('neuralCanvas');
+    const ctx = canvas.getContext('2d');
+    let neurons = [];
+    let color = "#00e5ff";
+
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Neuron {
+        constructor() { this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.vx=(Math.random()-0.5)*0.8; this.vy=(Math.random()-0.5)*0.8; }
+        update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>canvas.width)this.vx*=-1; if(this.y<0||this.y>canvas.height)this.vy*=-1; }
+        draw() { ctx.beginPath(); ctx.arc(this.x,this.y,2,0,Math.PI*2); ctx.fillStyle=color; ctx.fill(); }
+    }
+    for(let i=0; i<70; i++) neurons.push(new Neuron());
+
+    function animate() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        neurons.forEach(n => { n.update(); n.draw(); });
+        ctx.strokeStyle=color; ctx.lineWidth=0.2;
+        for(let i=0; i<neurons.length; i++) {
+            for(let j=i; j<neurons.length; j++) {
+                let d = Math.hypot(neurons[i].x-neurons[j].x, neurons[i].y-neurons[j].y);
+                if(d < 120) { ctx.globalAlpha = 1 - d/120; ctx.beginPath(); ctx.moveTo(neurons[i].x,neurons[i].y); ctx.lineTo(neurons[j].x,neurons[j].y); ctx.stroke(); }
+            }
+        }
+        ctx.globalAlpha = 1; requestAnimationFrame(animate);
+    }
+    animate();
+
+    // --- 2. PYTHON BRAIN LOGIC ---
+    async function processOmega() {
+        let inputField = document.getElementById("userInput");
+        let ui = document.getElementById("mainUI");
+        let loader = document.getElementById("loadingIndicator");
+        let msg = inputField.value.trim();
+        
+        if (!msg) return;
+
+        addMessage(msg, 'user-msg');
+        inputField.value = "";
+        
+        // සිතන අවස්ථාව (Thinking State)
+        ui.classList.add("state-thinking");
+        loader.style.display = "block";
+        color = "#d400ff"; // Animation එක දම් පාට වෙනවා
+
+        try {
+            let response = await fetch("http://127.0.0.1:5000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: msg })
+            });
+
+            let data = await response.json();
+            addMessage(data.reply, 'ai-msg');
+
+        } catch (e) {
+            addMessage("⚠️ Python Brain එක Offline වගේ යාලු. Terminal එක චෙක් කරන්න.", 'ai-msg');
+        } finally {
+            ui.classList.remove("state-thinking");
+            loader.style.display = "none";
+            color = "#00e5ff"; // ආපහු නිල් පාට වෙනවා
+        }
+    }
+
+    function addMessage(text, className) {
+        let history = document.getElementById("chat-history");
+        let div = document.createElement("div");
+        div.className = `message ${className}`;
+        div.innerHTML = text;
+        history.appendChild(div);
+        history.scrollTop = history.scrollHeight;
+    }
+
+    document.getElementById("userInput").addEventListener("keypress", (e) => { if(e.key==="Enter") processOmega(); });
+</script>
+</body>
+</html>
