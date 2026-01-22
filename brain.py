@@ -1,19 +1,14 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import google.generativeai as genai
-
-# 1. ඇප් එක සැකසීම
-app = Flask(__name__)
-CORS(app) 
-
 import os
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 import google.generativeai as genai
 
-# 1. ඇප් එක සැකසීම
+# ඇප් එක සහ CORS සක්‍රීය කිරීම
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
+
+# ආරක්ෂිත පියවර: යතුර ලබා ගැනීම
+GENAI_API_KEY = os.environ.get("GEMINI_API_KEY")
 
 # --- ආරක්ෂිත පියවර: සැබෑ යතුර මෙතන නැත ---
 GENAI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -72,3 +67,4 @@ if __name__ == "__main__":
     print(f"🚀 Omega Brain is starting on port {port}...")
     # අන්තර්ජාලයට දොරවල් විවෘත කිරීම
     app.run(host='0.0.0.0', port=port)
+
