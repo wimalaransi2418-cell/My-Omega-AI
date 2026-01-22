@@ -67,8 +67,8 @@ def chat_engine():
 
 if __name__ == "__main__":
     import os
+    # Render එකට අවශ්‍ය Port එක හඳුනා ගැනීම
     port = int(os.environ.get("PORT", 5000))
     print(f"🚀 Omega Brain is starting on port {port}...")
     # අන්තර්ජාලයට දොරවල් විවෘත කිරීම
     app.run(host='0.0.0.0', port=port)
-
